@@ -4,5 +4,4 @@ opencv-python
 keyboard
 pynput
 PyQt6
-websockets
 Pillow
