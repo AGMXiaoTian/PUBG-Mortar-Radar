@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Tactical Radar Widget</title>
+    <style>
+        /* 极致透明与电竞风格 */
+        body {
+            margin: 0;
+            overflow: hidden; /* 隐藏滚动条 */
+            background-color: transparent; /* 关键：让网页背景完全透明 */
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            user-select: none;
+        }
+
+        /* 普通雷达数字容器 */
+        #radar-container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            gap: 15px;
+            text-shadow: 2px 2px 2px rgba(0,0,0,0.8); /* 黑色描边防看不清 */
+        }
+        .dist-lbl { font-size: 24px; font-weight: bold; }
+        #lbl-1 { color: #FFFF00; }
+        #lbl-2 { color: #FF5500; }
+        #lbl-3 { color: #3399FF; }
+        #lbl-4 { color: #33FF33; }
+
+        /* 攻顶标尺画布 */
+        #siege-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: none; /* 默认隐藏 */
+        }
+    </style>
+</head>
+<body>
+
+    <div id="radar-container">
+        <div id="lbl-1" class="dist-lbl">0</div>
+        <div id="lbl-2" class="dist-lbl">0</div>
+        <div id="lbl-3" class="dist-lbl">0</div>
+        <div id="lbl-4" class="dist-lbl">0</div>
+    </div>
+
+    <canvas id="siege-canvas"></canvas>
+
+    <script>
+        // 物理常量映射表
+        const KEDU_TO_ANGLE = [0, 0.56, 1.69, 2.82, 3.94, 5.06, 6.18, 7.29, 8.40, 9.50, 10.59, 
+                               11.67, 12.75, 13.82, 14.88, 15.92, 16.96, 17.99, 19.00, 20.00, 
+                               20.99, 21.97, 22.93, 23.88, 24.82, 25.74];
+
+        function getAngle(tick) {
+            let abs_tick = Math.abs(tick);
+            if (abs_tick < KEDU_TO_ANGLE.length) return KEDU_TO_ANGLE[abs_tick];
+            return KEDU_TO_ANGLE[KEDU_TO_ANGLE.length - 1] + (abs_tick - 25) * 0.92;
+        }
+
+        // JS 版弹道计算器
+        function calcDial(dist, tick, g, v) {
+            if (!g || !v || dist <= 0) return 0;
+            let angle = getAngle(tick);
+            if (angle === 0) return Math.round(dist);
+            
+            let height = dist * Math.tan(angle * Math.PI / 180);
+            if (tick < 0) height = -height;
+            
+            let a = -g * dist / (2 * v * v);
+            let c = a - (height / dist);
+            let delta = 1 - 4 * a * c;
+            
+            if (delta < 0) return -1;
+            let sita = (-1 - Math.sqrt(delta)) / (2 * a);
+            let hudu = Math.atan(sita);
+            let dial_dis = (v * v * Math.cos(hudu) * Math.sin(hudu)) / 4.9;
+            return Math.round(dial_dis);
+        }
+
+        // Canvas 初始化
+        const canvas = document.getElementById('siege-canvas');
+        const ctx = canvas.getContext('2d');
+        const colors = ["#FFFF00", "#FF5500", "#3399FF", "#33FF33"];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function drawSiege(distances, g, v) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // 清空画布
+            let cx = canvas.width / 2;
+            let cy = canvas.height / 2;
+
+            // 画主垂直虚线
+            ctx.beginPath();
+            ctx.setLineDash([4, 6]);
+            ctx.moveTo(cx, cy - 720);
+            ctx.lineTo(cx, cy + 720);
+            ctx.strokeStyle = "#FF4500";
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            ctx.setLineDash([]); // 恢复实线
+
+            let tick_spacing = 28.8;
+
+            for (let i = -25; i <= 25; i++) {
+                let y = cy - (i * tick_spacing);
+                
+                if (i === 0) {
+                    ctx.fillStyle = "#00FF00";
+                    ctx.fillRect(cx - 30, y - 1, 60, 2);
+                    ctx.font = "bold 14px Arial";
+                    ctx.fillText("0", cx + 45, y + 5);
+                } else {
+                    let line_len = (i % 5 === 0) ? 15 : 8;
+                    ctx.fillStyle = (i > 0) ? "#FFFF00" : "#00BFFF";
+                    ctx.fillRect(cx - line_len, y - 0.5, line_len * 2, 1);
+                    if (i % 5 === 0) {
+                        ctx.font = "bold 12px Arial";
+                        ctx.fillText(i, cx + line_len + 15, y + 4);
+                    }
+                }
+
+                // 绘制各个目标的密位计算结果
+                for (let j = 0; j < 4; j++) {
+                    let d = parseInt(distances[j]);
+                    if (d >= 100 && d <= 700) {
+                        let dial = calcDial(d, i, g, v);
+                        if (dial >= 100 && dial <= 700 && (dial !== d || i === 0)) {
+                            ctx.fillStyle = colors[j];
+                            ctx.font = "bold 13px Arial";
+                            let text = `[${dial}]`;
+                            if (j === 0) ctx.fillText(text, cx - 85, y + 5);
+                            if (j === 1) ctx.fillText(text, cx - 45, y + 5);
+                            if (j === 2) ctx.fillText(text, cx + 50, y + 5);
+                            if (j === 3) ctx.fillText(text, cx + 90, y + 5);
+                        }
+                    }
+                }
+            }
+        }
+
+        // ==========================================
+        // WebSocket 通信核心
+        // ==========================================
+        function connectWS() {
+            const ws = new WebSocket('ws://127.0.0.1:8899');
+            
+            ws.onopen = () => console.log('已成功连接到本地 Python 战术引擎！');
+            
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                
+                // 更新顶部普通数字
+                for(let i=0; i<4; i++) {
+                    document.getElementById(`lbl-${i+1}`).innerText = data.distances[i];
+                }
+
+                // 处理 F8 攻顶模式
+                if (data.is_siege_mode) {
+                    canvas.style.display = 'block';
+                    drawSiege(data.distances, data.physics_g, data.physics_v);
+                } else {
+                    canvas.style.display = 'none';
+                }
+            };
+
+            ws.onclose = () => {
+                console.log('连接断开，1秒后尝试重连...');
+                setTimeout(connectWS, 1000);
+            };
+            
+            ws.onerror = (err) => console.error('WebSocket Error:', err);
+        }
+
+        // 启动连接
+        connectWS();
+    </script>
+</body>
+</html>

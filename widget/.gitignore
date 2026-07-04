@@ -1,0 +1,21 @@
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+bin/
+obj/
+AppPackages/
+BundleArtifacts/
+
+# Signing keys
+*.pfx
+*.p12
+*.cer
+
+# Version backups
+版本备份/
+版本备份.7z

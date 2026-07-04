@@ -1,0 +1,23 @@
+# Build artifacts (applies to both script/ and widget/)
+build/
+dist/
+__pycache__/
+*.pyc
+*.exe
+*.pyd
+*.pfx
+*.cer
+*.suo
+*.user
+bin/
+obj/
+AppPackages/
+BundleArtifacts/
+.vs/
+
+# Personal config
+config.json
+
+# OS files
+Thumbs.db
+.DS_Store

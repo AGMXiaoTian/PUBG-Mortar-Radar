@@ -1,0 +1,68 @@
+{
+    "resolution": "2K (2560x1440)",
+    "color_preset": "默认",
+    "color_tolerance": 20,
+    "monitor_tiny": {
+        "top": 0,
+        "left": 0,
+        "width": 345,
+        "height": 345
+    },
+    "player_tiny": {
+        "x": 172,
+        "y": 169
+    },
+    "multiplier_tiny": 1.0,
+    "monitor_small": {
+        "top": 0,
+        "left": 0,
+        "width": 610,
+        "height": 740
+    },
+    "player_small": {
+        "x": 303,
+        "y": 389
+    },
+    "multiplier_small": 1.0,
+    "monitor_big": {
+        "top": 0,
+        "left": 0,
+        "width": 2560,
+        "height": 1440
+    },
+    "player_big": {
+        "x": 1279,
+        "y": 716
+    },
+    "multiplier_big": 1.0,
+    "ui_pos_tiny": "+100+100",
+    "ui_pos_small": "+100+100",
+    "ui_font_size": 18,
+    "scan_fps": 10,
+    "markers": [
+        {
+            "name": "P1(黄)",
+            "color_hex": "#FFFF00",
+            "lower_bgr": [13, 217, 231],
+            "upper_bgr": [53, 255, 255]
+        },
+        {
+            "name": "P2(红/橙)",
+            "color_hex": "#FF5500",
+            "lower_bgr": [2, 92, 224],
+            "upper_bgr": [42, 132, 255]
+        },
+        {
+            "name": "P3(蓝)",
+            "color_hex": "#3399FF",
+            "lower_bgr": [204, 69, 20],
+            "upper_bgr": [244, 109, 60]
+        },
+        {
+            "name": "P4(绿)",
+            "color_hex": "#33FF33",
+            "lower_bgr": [121, 178, 6],
+            "upper_bgr": [161, 218, 46]
+        }
+    ]
+}

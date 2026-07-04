@@ -1,0 +1,21 @@
+# Build artifacts
+build/
+dist/
+obf_dist/
+.pyarmor/
+*.spec
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Compiled binaries
+*.exe
+*.pyd
+
+# License files
+license.key
+
+# Personal config (copy config.example.json to config.json and fill in your values)
+config.json

@@ -1,0 +1,29 @@
+﻿<Page
+    x:Class="TacticalRadarFinal.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:TacticalRadarFinal"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="Transparent">
+
+    <Grid>
+        <Button x:Name="LayoutBtn" Content="切换布局" Click="ToggleLayout_Click" 
+                HorizontalAlignment="Left" VerticalAlignment="Top" 
+                Opacity="0.0" IsHitTestVisible="False"/>
+
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+
+            <TextBlock x:Name="ManualDistText" Text="" FontSize="28" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" Margin="0, 0, 0, 10" Visibility="Collapsed" />
+
+            <StackPanel x:Name="DataStack" Orientation="Horizontal" HorizontalAlignment="Center">
+                <TextBlock x:Name="DistYellow" Text="0" FontSize="26" FontWeight="Bold" Foreground="Yellow" Margin="0,0,20,0"/>
+                <TextBlock x:Name="DistRed" Text="0" FontSize="26" FontWeight="Bold" Foreground="#FFFF4500" Margin="0,0,20,0"/>
+                <TextBlock x:Name="DistBlue" Text="0" FontSize="26" FontWeight="Bold" Foreground="#FF0077FF" Margin="0,0,20,0"/>
+                <TextBlock x:Name="DistGreen" Text="0" FontSize="26" FontWeight="Bold" Foreground="Lime"/>
+            </StackPanel>
+
+        </StackPanel>
+    </Grid>
+</Page>
