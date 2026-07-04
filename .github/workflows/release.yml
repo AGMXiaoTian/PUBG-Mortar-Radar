@@ -6,7 +6,7 @@ on:
       - 'v*'
 
 jobs:
-  build-script:
+  build:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,15 +22,15 @@ jobs:
           pip install -r requirements.txt
           pip install pyinstaller
 
-      - name: Build radar_scanner.exe
+      - name: Build 迫击炮测距工具.exe
         run: |
           cd script
-          pyinstaller --onefile --console --name "迫击炮测距工具" --add-data "index.html;." radar_scanner.py
+          pyinstaller --onefile --console --name "迫击炮测距工具" radar_scanner.py
 
-      - name: Build ui_config_tool.exe
+      - name: Build 调试工具.exe
         run: |
           cd script
-          pyinstaller --onefile --windowed --name "调试工具" --add-data "config_icon.ico;." ui_config_tool.py
+          pyinstaller --onefile --windowed --name "调试工具" ui_config_tool.py
 
       - name: Prepare release package
         run: |
@@ -38,63 +38,10 @@ jobs:
           copy script\dist\迫击炮测距工具.exe release\
           copy script\dist\调试工具.exe release\
           copy script\config.example.json release\
-          copy script\index.html release\
-
-      - name: Upload script artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: script-exe
-          path: release\
-
-  build-widget:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v2
-
-      - name: Restore NuGet
-        run: |
-          cd widget\TacticalRadarFinal
-          nuget restore TacticalRadarFinal.sln
-
-      - name: Build widget
-        run: |
-          msbuild widget\TacticalRadarFinal\TacticalRadarFinal.sln /p:Configuration=Release /p:Platform=x64 /p:AppxPackageDir=..\..\release\ /p:AppxBundle=Always /p:UapAppxPackageBuildMode=SideloadOnly
-
-      - name: Upload widget artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: widget-msix
-          path: release\
-
-  create-release:
-    needs: [build-script, build-widget]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: script-exe
-          path: release/
-
-      - uses: actions/download-artifact@v4
-        with:
-          name: widget-msix
-          path: release/
-
-      - name: Package zip
-        run: |
-          cd release
-          zip -r ../PUBG迫击炮标点测距工具.zip .
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           name: "PUBG 迫击炮标点测距工具 ${{ github.ref_name }}"
-          files: |
-            release/*
-            PUBG迫击炮标点测距工具.zip
+          files: release/*
           generate_release_notes: true
